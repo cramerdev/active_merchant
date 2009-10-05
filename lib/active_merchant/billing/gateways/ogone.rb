@@ -132,7 +132,11 @@ module ActiveMerchant #:nodoc:
           perform_non_referenced_credit(money, identification_or_credit_card, options)
         end
       end
-
+      
+      def test?
+        @options[:test] || super
+      end
+      
       private
       def reference_from(authorization)
         authorization.split(";").first
@@ -224,7 +228,7 @@ module ActiveMerchant #:nodoc:
         add_pair parameters, 'PSPID',      @options[:login]
         add_pair parameters, 'USERID',     @options[:user]
         add_pair parameters, 'PSWD',       @options[:password]
-        url = URLS[test? ? :test : production][parameters['PAYID'] ? :maintenance : :order ]
+        url = URLS[test? ? :test : :production][parameters['PAYID'] ? :maintenance : :order ]
         response = parse(ssl_post(url, post_data(action, parameters)))
         options = { :authorization => [response["PAYID"], action].join(";"),
                     :test => test?,
